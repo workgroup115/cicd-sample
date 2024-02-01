@@ -58,7 +58,8 @@ jobs:
       - name: Create or update Cloud Deploy Pipeline
         run: |-
           gcloud deploy apply --file deploy/pipeline.yaml --region us-central1 --project tokyo-dream-412202
-          gcloud deploy apply --file deploy/staging.yaml --region us-central1 --project tokyo-dream-412202                           
+          gcloud deploy apply --file deploy/staging.yaml --region us-central1 --project tokyo-dream-412202
+          gcloud deploy apply --file deploy/production.yaml --region us-central1 --project tokyo-dream-412202
 
       # Initiate deployment following the pipeline definition from your clouddeploy.yaml file
       - name: Create release
