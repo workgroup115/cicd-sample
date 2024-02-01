@@ -49,7 +49,8 @@ jobs:
       # Build your application image following the specified profile as defined in your skaffold.yaml file
       - name: Skaffold build
         run: |-
-          skaffold build --default-repo=us-central1-docker.pkg.dev/tokyo-dream-412202/cicd-artifacts \
+          skaffold build --file-output=/home/runner/artifacts.json \
+                         --default-repo=us-central1-docker.pkg.dev/tokyo-dream-412202/cicd-artifacts \
                          --push=true \
                          --filename='skaffold.yaml'
 
@@ -66,5 +67,6 @@ jobs:
             --delivery-pipeline cicd-ga-sample-pipeline \
             --description "$(git log -1  --pretty='%s')" \
             --region=us-central1 \
+            --build-artifacts /home/runner/artifacts.json \
             --annotations "commit_ui=https://source.cloud.google.com/tokyo-dream-412202/cicd-sample/+/$GITHUB_SHA" \
 
