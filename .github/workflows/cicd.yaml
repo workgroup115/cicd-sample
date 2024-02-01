@@ -1,0 +1,73 @@
+# Sample workflow from the Engineering Productivity team.
+# Deploy your application to Google Kubernetes Engine using Cloud Deploy
+# You must have enabled GitHub Actions for your Google Cloud Project as part of the cloud onboarding process to use this workflow.
+name: Cloud Deploy
+on:
+  push:
+    branches:
+      - master
+env: 
+  # The Google Cloud Region where you want to deploy; you likely don't have to change this
+  REGION: us-central1
+  PROJECT_ID: tokyo-dream-412202
+  
+jobs:
+  cloud-deploy-st:
+    name: Deploy to Staging
+    runs-on: [ubuntu-latest]
+    permissions:
+      contents: 'write'
+      pull-requests: 'write'
+      id-token: 'write'
+    steps:
+      # Check out your GitHub repo into the container executing these steps
+      - name: "Cloning repo"
+        uses: actions/checkout@v4
+
+      # Authenticate to the Google Cloud platform using Workload Identity Federation, the most secure and preferred
+      # way to connect to our Google Cloud Platform from GitHub.
+      - name: Authenticate to GCP using WIF
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{secrets.WORKLOAD_IDENTITY_PROVIDER_GCP}}
+          service_account:  'cicd-servacc@tokyo-dream-412202.iam.gserviceaccount.com'
+          project_id:  tokyo-dream-412202
+          token_format: 'access_token'    
+
+      # The GCloud CLI must be installed and configured in the container to enable subsequent steps
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: tokyo-dream-412202
+          install_components: 'skaffold'
+
+      # Configure docker authorization for access to the Google Artifact Registry
+      - name: Configure Docker
+        run: |-
+          gcloud --quiet auth configure-docker us-central1-docker.pkg.dev      
+          
+      # Build your application image following the specified profile as defined in your skaffold.yaml file
+      - name: Skaffold build
+        run: |-
+          skaffold build --file-output=/workspace/artifacts.json \
+                         --default-repo=us-central1-docker.pkg.dev/tokyo-dream-412202/cicd-artifacts \
+                         --push=true \
+                         --filename='skaffold.yaml'
+
+      # Set up Cloud Deploy in your project following the definition in your clouddeploy.yaml file
+      - name: Create or update Cloud Deploy Pipeline
+        run: |-
+          gcloud deploy apply --file deploy/pipeline.yaml --region us-central1 --project tokyo-dream-412202
+          gcloud deploy apply --file deploy/staging.yaml --region us-central1 --project tokyo-dream-412202                           
+
+      # Initiate deployment following the pipeline definition from your clouddeploy.yaml file
+      - name: Create release
+        run: |-
+          gcloud deploy releases create rel-$GITHUB_SHA \
+            --delivery-pipeline cicd-ga-sample-pipeline \
+            --description "$(git log -1  --pretty='%s')" \
+            --region=us-central1 \
+            --to-target='staging' \
+            --skaffold-file=skaffold.yaml
+            --build-artifacts /workspace/artifacts.json \
+            --annotations "commit_ui=https://source.cloud.google.com/tokyo-dream-412202/cicd-sample/+/$GITHUB_SHA"  
