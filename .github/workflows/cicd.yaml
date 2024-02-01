@@ -51,7 +51,7 @@ jobs:
         run: |-
           skaffold build --default-repo=us-central1-docker.pkg.dev/tokyo-dream-412202/cicd-artifacts \
                          --push=true \
-                         -filename='skaffold.yaml'
+                         --filename='skaffold.yaml'
 
       # Set up Cloud Deploy in your project following the definition in your clouddeploy.yaml file
       - name: Create or update Cloud Deploy Pipeline
