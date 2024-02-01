@@ -4,7 +4,7 @@ const app = express();
 const port = 8080;
 
 app.get('/healthz', (req, res) => {
-    res.send('Healthy!!');
+    res.send(`This is a healthy application running in ${process.env.VERSION}!!`);
 });
 
 app.get('/version', (req, res) => {
