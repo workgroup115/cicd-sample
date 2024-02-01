@@ -49,10 +49,9 @@ jobs:
       # Build your application image following the specified profile as defined in your skaffold.yaml file
       - name: Skaffold build
         run: |-
-          skaffold build --file-output=/workspace/artifacts.json \
-                         --default-repo=us-central1-docker.pkg.dev/tokyo-dream-412202/cicd-artifacts \
+          skaffold build --default-repo=us-central1-docker.pkg.dev/tokyo-dream-412202/cicd-artifacts \
                          --push=true \
-                         --filename='skaffold.yaml'
+                         -filename='skaffold.yaml'
 
       # Set up Cloud Deploy in your project following the definition in your clouddeploy.yaml file
       - name: Create or update Cloud Deploy Pipeline
@@ -67,7 +66,6 @@ jobs:
             --delivery-pipeline cicd-ga-sample-pipeline \
             --description "$(git log -1  --pretty='%s')" \
             --region=us-central1 \
+            --annotations "commit_ui=https://source.cloud.google.com/tokyo-dream-412202/cicd-sample/+/$GITHUB_SHA" \
             --to-target='staging' \
             --skaffold-file=skaffold.yaml
-            --build-artifacts /workspace/artifacts.json \
-            --annotations "commit_ui=https://source.cloud.google.com/tokyo-dream-412202/cicd-sample/+/$GITHUB_SHA"  
