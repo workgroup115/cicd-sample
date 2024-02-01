@@ -67,5 +67,4 @@ jobs:
             --description "$(git log -1  --pretty='%s')" \
             --region=us-central1 \
             --annotations "commit_ui=https://source.cloud.google.com/tokyo-dream-412202/cicd-sample/+/$GITHUB_SHA" \
-            --to-target='staging' \
-            --skaffold-file=skaffold.yaml
+
