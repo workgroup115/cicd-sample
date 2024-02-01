@@ -1,15 +1,16 @@
 apiVersion: deploy.cloud.google.com/v1
 kind: Target
 metadata:
-  name: staging
+  name: production
   annotations: {}
   labels: {}
-description: staging
+description: production
+requireApproval: true
 gke:
-  cluster: projects/tokyo-dream-412202/locations/us-central1/clusters/staging
+  cluster: projects/tokyo-dream-412202/locations/us-central1/clusters/production
 executionConfigs:
 - defaultPool:
     serviceAccount: cicd-servacc@tokyo-dream-412202.iam.gserviceaccount.com
   usages:
   - RENDER
-  - DEPLOY
+  - DEPLOY  

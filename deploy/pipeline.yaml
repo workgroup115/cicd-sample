@@ -10,3 +10,6 @@ serialPipeline:
   - targetId: staging
     profiles:
     - staging
+  - targetId: production
+    profiles:
+    - production    
