@@ -7,3 +7,9 @@ metadata:
 description: staging
 gke:
   cluster: projects/tokyo-dream-412202/locations/us-central1/clusters/staging
+executionConfigs:
+- defaultPool:
+    serviceAccount: cicd-servacc@tokyo-dream-412202.iam.gserviceaccount.com
+  usages:
+  - RENDER
+  - DEPLOY  
